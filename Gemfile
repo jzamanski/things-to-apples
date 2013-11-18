@@ -46,3 +46,6 @@ end
 
 # Use rspec for testing
 gem 'rspec-rails', '>= 2.12.2', :group => [:development, :test]
+
+# Use Devise for authentication
+gem 'devise'
