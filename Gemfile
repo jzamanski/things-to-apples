@@ -44,8 +44,9 @@ end
 # Use debugger
 # gem 'debugger', group: [:development, :test]
 
-# Use Rspec & Capybara for testing
+# Use Rspec, Capybara & Factory Girl for testing
 gem 'rspec-rails', '>= 2.12.2', group: [:development, :test]
+gem 'factory_girl_rails', '>= 4.2.0', group: [:development, :test]
 gem 'capybara', '>= 2.0.2', group: :test
 
 # Use Devise for authentication
