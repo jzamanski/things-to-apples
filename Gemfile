@@ -29,6 +29,7 @@ gem 'uglifier', '>= 1.3.0'
 # Testing
 gem 'rspec-rails', group: [:development, :test]
 gem 'capybara', group: :test
+gem 'shoulda-matchers', group: :test
 gem 'factory_girl_rails', group: [:development, :test]
 
 # Documentation
