@@ -6,7 +6,7 @@ describe 'User Sessions' do
     within('.nav') { click_link('Login') }
   end
 
-  context 'failure' do
+  context 'login failure' do
     before do
       fill_in 'Email', with: user.email
       fill_in 'Password', with: ''
@@ -27,11 +27,15 @@ describe 'User Sessions' do
     end
   end
 
-  context 'success' do
+  context 'login success' do
     before do
       fill_in 'Email', with: user.email
       fill_in 'Password', with: user.password
       click_button 'Sign in'
+    end
+
+    it 'redirects to the authenticated root page' do
+      current_path.should == user_path
     end
 
     it 'displays a welcome message' do
