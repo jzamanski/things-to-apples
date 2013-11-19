@@ -24,6 +24,8 @@ gem 'uglifier', '>= 1.3.0'
 # gem 'turbolinks'
 
 # Debugging
+gem 'better_errors', group: :development
+gem 'binding_of_caller', group: :development
 # gem 'debugger', group: [:development, :test]
 
 # Testing
