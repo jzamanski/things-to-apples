@@ -10,6 +10,9 @@ gem 'sqlite3'
 gem 'devise'
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
+# HTML
+gem 'haml'
+
 # JSON
 gem 'jbuilder', '~> 1.2'
 
