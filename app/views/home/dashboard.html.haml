@@ -1,0 +1,49 @@
+%h3= "#{current_user.email}'s Dashboard"
+%hr
+%h4 Active Games
+%table
+  %tr
+    %th Game
+    %th Total Players
+    %th Total Rounds
+    %th Current Players
+    %th Current Round
+  - current_user.games.active.each do |game|
+    %tr
+      %td= game.id
+      %td= game.num_players
+      %td= game.num_rounds
+      %td= game.users.count
+      %td= game.round
+%hr
+%h4 Open Games
+%table
+  %tr
+    %th Game
+    %th Total Players
+    %th Total Rounds
+    %th Current Players
+    %th Current Round
+  - current_user.games.waiting.each do |game|
+    %tr
+      %td= game.id
+      %td= game.num_players
+      %td= game.num_rounds
+      %td= game.users.count
+      %td= game.round
+%hr
+%h4 Created Games
+%table
+  %tr
+    %th Game
+    %th Total Players
+    %th Total Rounds
+    %th Current Players
+    %th Current Round
+  - Game.created_by(current_user).each do |game|
+    %tr
+      %td= game.id
+      %td= game.num_players
+      %td= game.num_rounds
+      %td= game.users.count
+      %td= game.round

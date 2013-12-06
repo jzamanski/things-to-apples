@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131119231537) do
+ActiveRecord::Schema.define(version: 20131120034146) do
 
   create_table "game_users", force: true do |t|
     t.integer  "game_id",       null: false
@@ -26,6 +26,9 @@ ActiveRecord::Schema.define(version: 20131119231537) do
     t.integer  "num_rounds"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "creator_id"
+    t.integer  "state"
+    t.integer  "round"
   end
 
   create_table "users", force: true do |t|

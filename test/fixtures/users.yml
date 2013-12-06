@@ -1,0 +1,7 @@
+one:
+  email: j@z.com
+  encrypted_password: $2a$10$zsvEpTRcP29K1hesQSo3heQCASBKd42uyR9CtzaPWROfyHEWqYtU2
+
+two:
+  email: k@a.com
+  encrypted_password: $2a$10$Z2Vr9MSq2U0jCKxsuTFtruHFAOlIPJoMTbGi4xJDPWoRmTLtYa03W

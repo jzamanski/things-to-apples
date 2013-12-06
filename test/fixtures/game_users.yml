@@ -1,0 +1,14 @@
+one:
+  game: one
+  user: one
+  player_number: one
+
+two:
+  game: one
+  user: two
+  player_number: two
+
+three:
+  game: two
+  user: two
+  player_number: one

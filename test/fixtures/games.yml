@@ -1,0 +1,13 @@
+one:
+  creator: one
+  num_players: 4
+  num_rounds: 4
+  state: 0
+  round: 0
+
+two:
+  creator: two
+  num_players: 4
+  num_rounds: 4
+  state: 0
+  round: 0
