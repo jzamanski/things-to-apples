@@ -1,13 +1,13 @@
 one:
+  num_players: 3
+  num_rounds: 3
   creator: one
-  num_players: 4
-  num_rounds: 4
-  state: 0
+  active: true
   round: 0
 
 two:
+  num_players: 3
+  num_rounds: 3
   creator: two
-  num_players: 4
-  num_rounds: 4
-  state: 0
+  active: true
   round: 0
