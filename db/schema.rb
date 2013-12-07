@@ -11,7 +11,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131206192754) do
+ActiveRecord::Schema.define(version: 20131207181437) do
+
+  create_table "cards", force: true do |t|
+    t.string   "phrase"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "game_cards", force: true do |t|
+    t.integer  "game_id"
+    t.integer  "round"
+    t.integer  "card_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "game_cards", ["card_id"], name: "index_game_cards_on_card_id"
+  add_index "game_cards", ["game_id"], name: "index_game_cards_on_game_id"
 
   create_table "game_users", force: true do |t|
     t.integer  "game_id",       null: false

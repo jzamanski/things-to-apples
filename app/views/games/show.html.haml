@@ -1,1 +1,4 @@
 = "Game: #{@game.to_json}"
+%ul
+  - @game.cards.each do |card|
+    %li= card.phrase
