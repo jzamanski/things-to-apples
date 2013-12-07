@@ -1,13 +1,6 @@
 one:
   num_players: 3
   num_rounds: 3
-  creator: one
-  active: true
-  round: 0
-
-two:
-  num_players: 3
-  num_rounds: 3
   creator: two
   active: true
   round: 0

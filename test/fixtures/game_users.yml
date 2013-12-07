@@ -1,14 +1,9 @@
 one:
   game: one
-  player: one
+  player: two
   player_number: one
 
 two:
   game: one
   player: three
   player_number: two
-
-three:
-  game: two
-  player: two
-  player_number: one

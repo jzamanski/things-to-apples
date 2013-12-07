@@ -4,10 +4,12 @@ ThingsToApples::Application.routes.draw do
     root to: 'home#index'
   end
   authenticated :user do
-    root to: 'home#dashboard', as: :auth_root
+    root to: 'games#index', as: :auth_root
   end
 
-  resources :games, only: [:new, :create]
+  resources :games, only: [:index, :new, :create, :show] do
+    post 'join'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

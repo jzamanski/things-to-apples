@@ -16,6 +16,9 @@ class Game < ActiveRecord::Base
   before_validation :set_defaults, {on: :create}
 
   # Scopes
+  def self.active
+    where(active: true)
+  end
   def self.awaiting_players
     where(active: true, round: 0)
   end
@@ -35,11 +38,15 @@ class Game < ActiveRecord::Base
   
   # Add a player to the game
   def add_player(player)
-    if self.players.count < self.num_players
-      self.game_players.create(player: player, player_number: self.game_players.count+1)
-      if self.players.count == num_players
-        self.update_attributes(round: 1)
-      end
+    # Confirm the game is not full
+    unless self.players.count < self.num_players
+      game.errors.add(:base, 'Game is full')
+      return false
+    end
+    # Add player
+    self.game_players.create(player: player, player_number: self.game_players.count+1)
+    if self.players.count == num_players
+      self.update_attributes(round: 1)
     end
   end
 

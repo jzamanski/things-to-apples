@@ -1,29 +1,19 @@
-%h3= "#{current_user.email}'s Dashboard"
-%hr
 = link_to('New Game', new_game_path)
-%h4 Games In Progress
+%h4 Join A Game
 %table
   %tr
     %th Game ID
     %th Current / Total Players
     %th Current / Total Rounds
-  - current_user.games.in_progress.each do |game|
-    %tr
-      %td= game.id
-      %td= "#{game.players.count} / #{game.num_players}"
-      %td= "#{game.round} / #{game.num_rounds}"
-%hr
-%h4 Games Awaiting Players
-%table
-  %tr
-    %th Game ID
-    %th Current / Total Players
-    %th Current / Total Rounds
+    %th Join
   - Game.awaiting_players.each do |game|
     %tr
       %td= game.id
       %td= "#{game.players.count} / #{game.num_players}"
       %td= "#{game.round} / #{game.num_rounds}"
+      %td
+        = form_for(game, {url: game_join_path(game), method: :post}) do |f|
+          = f.submit('Join')
 %hr
 %hr
 %hr
