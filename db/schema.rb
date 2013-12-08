@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131207181437) do
+ActiveRecord::Schema.define(version: 20131207194551) do
 
   create_table "cards", force: true do |t|
     t.string   "phrase"
@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(version: 20131207181437) do
     t.integer  "creator_id"
     t.integer  "round"
     t.boolean  "active"
+    t.integer  "judge_player_number"
   end
 
   create_table "users", force: true do |t|

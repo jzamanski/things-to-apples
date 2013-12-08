@@ -1,0 +1,6 @@
+%ul
+  %li= "Game: #{@game.to_json}"
+  %li= "Round: #{@game.round}"
+  %li= "Judge: #{@game.judge.email}"
+
+%h1= @game.card.phrase

@@ -1,9 +1,9 @@
 one:
   game: one
   player: two
-  player_number: one
+  player_number: 1
 
 two:
   game: one
   player: three
-  player_number: two
+  player_number: 2

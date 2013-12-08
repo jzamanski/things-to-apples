@@ -34,10 +34,27 @@ class Game < ActiveRecord::Base
     where(creator: user)
   end
 
+  # Instance methods - Informational
+  def waiting?
+    self.active && self.round == 0
+  end
+  def in_progress?
+    self.active && self.round > 0
+  end
+  def complete?
+    !self.active
+  end
+  def judge
+    self.game_players.where(player_number: self.judge_player_number).first.player
+  end
+  def card
+    self.game_cards.where(round: self.round).first.card
+  end
+
   #
-  # Instance methods
+  # Instance methods - Business Logic
   #
-  
+
   # Add a player to the game
   def add_player(player)
     # Confirm the game is not full
@@ -53,34 +70,30 @@ class Game < ActiveRecord::Base
     end
   end
 
-  def judge_name
-    self.round
-
+  # Set default values
+  def set_defaults
+    self.num_rounds ||= 3
+    self.num_players ||= 3
+    self.active = true
+    self.round = 0
   end
+  #protected :set_defaults
 
-  # Protected methods
-  protected
-    
-    # Set default values
-    def set_defaults
-      self.num_rounds ||= 3
-      self.num_players ||= 3
-      self.active = true
-      self.round = 0
-    end
+  # Start game
+  def start
+    # Select cards
+    card_ids = Card.random(self.num_rounds)
+    num_rounds.times{|round| self.game_cards.create(round: round+1, card_id: card_ids[round])}
+    # Set initial judge player index
+    self.update_attributes(judge_player_number: Random.new.rand(num_players) + 1)
+  end
+  #protected :start
 
-    # Start game
-    def start
-      # Select cards
-      card_ids = Card.random(self.num_rounds)
-      num_rounds.times do |round|
-        self.game_cards.create(round: round, card_id: card_ids[round])
-      end
-    end
-
-    # Advance game to the next round
-    def next_round
-      self.update_attributes(round: self.round + 1)
-    end
+  # Advance game to the next round
+  def next_round
+    self.update_attributes(round: self.round + 1)
+    self.update_attributes(judge_player_number: (self.judge_player_number % self.num_players) + 1)
+  end
+  #protected :next_round
 
 end

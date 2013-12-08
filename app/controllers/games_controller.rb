@@ -46,7 +46,18 @@ class GamesController < ApplicationController
 
   # Show a game
   def show
-    @game = Game.find_by(id: params[:id])
+    # Render based on user authorization and game state
+    unless @game = Game.find_by(id: params[:id])
+      redirect_to(games_path, {flash: {error: 'Unknown game.'}})
+    end
+    if @game.players.include?(current_user)
+      render(:show_waiting) if @game.waiting?
+      render(:show_in_progress) if @game.in_progress?
+    elsif @game.complete?
+      render(:show_complete)
+    else
+      redirect_to(games_path, {flash: {error: 'Game not complete.'}})
+    end
   end
-
+  
 end
