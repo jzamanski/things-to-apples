@@ -8,16 +8,16 @@ class GamesController < ApplicationController
   end
 
   def new
-    @new_game = Game.new
+    @game = Game.new
   end
 
   def create
     safe_params = params.require(:game).permit(:num_players, :num_rounds)
     
     # Create new game
-    @new_game = Game.create(safe_params.merge(creator: current_user))
-    if @new_game.persisted?
-      @new_game.add_player(current_user)
+    @game = Game.create(safe_params.merge(creator: current_user))
+    if @game.persisted?
+      @game.add_player(current_user)
       return redirect_to(auth_root_path, flash: {success: 'New game created successfully.'})
     else
       flash.now[:error] = 'Error creating new game.'
@@ -27,18 +27,17 @@ class GamesController < ApplicationController
 
   # Join a game
   def join
+    # Confirm game exists
+    unless @game = Game.find_by(id: params[:game_id])
+      return redirect_to(games_path, {flash: {error: 'Unknown game.'}})
+    end
     # Confirm user isn't already playing a game
     unless current_user.games.active.count == 0
       return redirect_to(games_path, {flash: {error: 'Please finish your current game first.'}})
     end
-    # Confirm game exists
-    game = Game.find_by(id: params[:game_id])
-    unless game
-      return redirect_to(games_path, {flash: {error: 'Game does not exist.'}})
-    end
     # Attempt to add player to game
-    if game.add_player(current_user)
-      return redirect_to(game_path(game))
+    if @game.add_player(current_user)
+      return redirect_to(game_path(@game))
     else
       redirect_to(games_path, {flash: {error: 'Unknown error joining game.'}})
     end
@@ -46,18 +45,29 @@ class GamesController < ApplicationController
 
   # Show a game
   def show
-    # Render based on user authorization and game state
-    unless @game = Game.find_by(id: params[:id])
-      redirect_to(games_path, {flash: {error: 'Unknown game.'}})
-    end
-    if @game.players.include?(current_user)
-      render(:show_waiting) if @game.waiting?
-      render(:show_in_progress) if @game.in_progress?
-    elsif @game.complete?
-      render(:show_complete)
-    else
-      redirect_to(games_path, {flash: {error: 'Game not complete.'}})
-    end
+    # Confirm game exists
+    return redirect_to(games_path, {flash: {error: 'Unknown game.'}}) unless @game = Game.find_by(id: params[:id])
+    # Show game if completed
+    return render(:show_complete) if @game.complete?
+    # Confirm user is playing game
+    return redirect_to(games_path, {flash: {error: 'You are not playing that game.'}}) unless @game.players.include?(current_user)
+    # Render waiting view
+    return render(:show_waiting) if @game.waiting?
+    # Render in progress view
+    return render(:show_in_progress) if @game.in_progress?
   end
-  
+
+  # Respond action
+  def respond
+    safe_params = params.require(:response).permit(:response)
+    # Confirm game exists
+    return redirect_to(games_path, {flash: {error: 'Unknown game.'}}) unless @game = Game.find_by(id: params[:game_id])
+    # Confirm game is in progress (so current_round doesn't fail)
+    return redirect_to(game_path(@game), {flash: {error: 'Game is not accepting responses'}}) unless @game.in_progress?
+    # Create response
+    response = @game.current_round.responses.create(safe_params.merge(player: current_user))
+    flash[:error] = response.errors.full_messages.to_sentence if response.errors.any?
+    return redirect_to(game_path(@game))
+  end
+
 end

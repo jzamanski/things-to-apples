@@ -1,8 +1,8 @@
 # Read about factories at https://github.com/thoughtbot/factory_girl
 
 FactoryGirl.define do
-  factory :game_card, :class => 'GameCards' do
-    game nil
-    card nil
+  factory :response, :class => 'Responses' do
+    phrase "MyString"
+    points 1
   end
 end

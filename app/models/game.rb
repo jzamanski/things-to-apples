@@ -4,8 +4,8 @@ class Game < ActiveRecord::Base
   belongs_to :creator, {class_name: :User, inverse_of: :created_games}
   has_many :game_players, {class_name: :GameUser}
   has_many :players, {through: :game_players}
-  has_many :game_cards
-  has_many :cards, {through: :game_cards}
+  has_many :rounds
+  has_many :responses, {through: :rounds}
   
   # Validations
   validates_presence_of :creator_id, :creator
@@ -36,64 +36,62 @@ class Game < ActiveRecord::Base
 
   # Instance methods - Informational
   def waiting?
-    self.active && self.round == 0
+    active && round == 0
   end
   def in_progress?
-    self.active && self.round > 0
+    active && round > 0
   end
   def complete?
-    !self.active
+    !active
   end
-  def judge
-    self.game_players.where(player_number: self.judge_player_number).first.player
-  end
-  def card
-    self.game_cards.where(round: self.round).first.card
+  def current_round
+    rounds.find_by(round: round)
   end
 
   #
   # Instance methods - Business Logic
   #
 
+  # Set default values
+  def set_defaults
+    num_rounds ||= 3
+    num_players ||= 3
+    active = true
+    round = 0
+  end
+  protected :set_defaults
+
   # Add a player to the game
   def add_player(player)
     # Confirm the game is not full
-    unless self.players.count < self.num_players
+    unless players.count < num_players
       game.errors.add(:base, 'Game is full')
       return false
     end
     # Add player
-    self.game_players.create(player: player, player_number: self.game_players.count+1)
-    if self.players.count == num_players
-      self.start
-      self.next_round
+    game_players.create(player: player)
+    if players.count == num_players
+      start
+      update_attributes(round: round + 1)
     end
   end
-
-  # Set default values
-  def set_defaults
-    self.num_rounds ||= 3
-    self.num_players ||= 3
-    self.active = true
-    self.round = 0
-  end
-  #protected :set_defaults
 
   # Start game
   def start
     # Select cards
-    card_ids = Card.random(self.num_rounds)
-    num_rounds.times{|round| self.game_cards.create(round: round+1, card_id: card_ids[round])}
-    # Set initial judge player index
-    self.update_attributes(judge_player_number: Random.new.rand(num_players) + 1)
+    card_ids = Card.random(num_rounds)
+    first_judge_index = Random.new.rand(num_players)
+    num_rounds.times do |index|
+      judge_index = ((first_judge_index + index) % num_players)
+      rounds.create(round: (index + 1), card_id: card_ids[index], judge_id: player_ids[judge_index])
+    end
   end
-  #protected :start
+  protected :start
 
   # Advance game to the next round
   def next_round
-    self.update_attributes(round: self.round + 1)
-    self.update_attributes(judge_player_number: (self.judge_player_number % self.num_players) + 1)
+    update_attributes(round: round + 1)
   end
-  #protected :next_round
+  protected :next_round
 
 end

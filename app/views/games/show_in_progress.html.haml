@@ -1,6 +1,21 @@
 %ul
   %li= "Game: #{@game.to_json}"
   %li= "Round: #{@game.round}"
-  %li= "Judge: #{@game.judge.email}"
+  %li= "Judge: #{@game.current_round.judge.email}"
 
-%h1= @game.card.phrase
+%h1= @game.current_round.card.phrase
+
+- if @game.current_round.responding?
+  - if @game.current_round.judge == current_user
+    Waiting for responses.
+  - else
+    - if @game.current_round.responses.map{|response| response.player}.include?(current_user)
+      Waiting for other players to respond.
+    - else
+      = form_for(@game.current_round.responses.new, {url: game_respond_path(@game), method: :post}) do |f|
+        = f.text_field(:response)
+        = f.submit
+- elsif @game.current_round.scoring?
+  SCORING!
+- else
+  PROBLEM: ROUND NOT RESPONDING OR SCORING

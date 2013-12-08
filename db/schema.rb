@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131207194551) do
+ActiveRecord::Schema.define(version: 20131208050719) do
 
   create_table "cards", force: true do |t|
     t.string   "phrase"
@@ -19,21 +19,9 @@ ActiveRecord::Schema.define(version: 20131207194551) do
     t.datetime "updated_at"
   end
 
-  create_table "game_cards", force: true do |t|
-    t.integer  "game_id"
-    t.integer  "round"
-    t.integer  "card_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "game_cards", ["card_id"], name: "index_game_cards_on_card_id"
-  add_index "game_cards", ["game_id"], name: "index_game_cards_on_game_id"
-
   create_table "game_users", force: true do |t|
-    t.integer  "game_id",       null: false
-    t.integer  "user_id",       null: false
-    t.integer  "player_number", null: false
+    t.integer  "game_id",    null: false
+    t.integer  "user_id",    null: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -46,8 +34,29 @@ ActiveRecord::Schema.define(version: 20131207194551) do
     t.integer  "creator_id"
     t.integer  "round"
     t.boolean  "active"
-    t.integer  "judge_player_number"
   end
+
+  create_table "responses", force: true do |t|
+    t.integer  "round_id"
+    t.integer  "player_id"
+    t.string   "response"
+    t.integer  "points"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "rounds", force: true do |t|
+    t.integer  "game_id"
+    t.integer  "round"
+    t.integer  "judge_id"
+    t.integer  "card_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "rounds", ["card_id"], name: "index_rounds_on_card_id"
+  add_index "rounds", ["game_id"], name: "index_rounds_on_game_id"
+  add_index "rounds", ["judge_id"], name: "index_rounds_on_judge_id"
 
   create_table "users", force: true do |t|
     t.string   "email",                  default: "", null: false
