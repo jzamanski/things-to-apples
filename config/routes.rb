@@ -10,6 +10,7 @@ ThingsToApples::Application.routes.draw do
   resources :games, only: [:index, :new, :create, :show] do
     post 'join'
     post 'respond'
+    post 'score'
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

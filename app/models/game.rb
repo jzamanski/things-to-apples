@@ -9,89 +9,90 @@ class Game < ActiveRecord::Base
   
   # Validations
   validates_presence_of :creator_id, :creator
-  validates_presence_of :active
+  validates_presence_of :current_state
+  validates_numericality_of :current_state, {only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 3}
   validates_numericality_of :num_players, {only_integer: true, greater_than_or_equal_to: 3, less_than_or_equal_to: 10}
   validates_numericality_of :num_rounds, {only_integer: true, greater_than_or_equal_to: :num_players, less_than_or_equal_to: 10}
-  validates_numericality_of :round, {only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: :num_rounds}
+  validates_numericality_of :current_round, {only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: :num_rounds}
 
   # Callbacks
   before_validation :set_defaults, {on: :create}
+  def set_defaults
+    self.num_rounds ||= 3
+    self.num_players ||= 3
+    self.current_state = 1
+    self.current_round = 0
+  end
+  protected :set_defaults
 
   # Scopes
-  def self.active
-    where(active: true)
-  end
-  def self.awaiting_players
-    where(active: true, round: 0)
-  end
-  def self.in_progress
-    where(active: true).where('round > 0')
-  end
-  def self.complete
-    where(active: false)
-  end
   def self.created_by(user)
     where(creator: user)
   end
+  def self.waiting_for_players
+    where(current_state: 1)
+  end
+  def self.in_progress
+    where(current_state: 2)
+  end
+  def self.complete
+    where(current_state: 3)  
+  end
+  def self.active
+    where(current_state: 1..2)
+  end
 
-  # Instance methods - Informational
-  def waiting?
-    active && round == 0
+  # Instance Methods - Predicates
+  def waiting_for_players?
+    current_state == 1
   end
   def in_progress?
-    active && round > 0
+    current_state == 2
   end
   def complete?
-    !active
+    current_state == 3
   end
-  def current_round
-    rounds.find_by(round: round)
+  def active?
+    waiting_for_players? || in_progress?
   end
 
-  #
-  # Instance methods - Business Logic
-  #
-
-  # Set default values
-  def set_defaults
-    num_rounds ||= 3
-    num_players ||= 3
-    active = true
-    round = 0
+  # Current round object
+  def round
+    rounds.find_by(round: current_round)
   end
-  protected :set_defaults
 
   # Add a player to the game
   def add_player(player)
     # Confirm the game is not full
-    unless players.count < num_players
-      game.errors.add(:base, 'Game is full')
-      return false
-    end
+    return game.errors.add(:base, 'Game is full') unless players.count < num_players
     # Add player
     game_players.create(player: player)
-    if players.count == num_players
-      start
-      update_attributes(round: round + 1)
-    end
+    start if players.count == num_players
   end
 
   # Start game
   def start
-    # Select cards
-    card_ids = Card.random(num_rounds)
+    # Randomly select cards and initial judge
+    card_ids = Card.sample(num_rounds)
     first_judge_index = Random.new.rand(num_players)
+    # Set up rounds
     num_rounds.times do |index|
       judge_index = ((first_judge_index + index) % num_players)
-      rounds.create(round: (index + 1), card_id: card_ids[index], judge_id: player_ids[judge_index])
+      rounds.create(round: (index + 1), card_id: card_ids[index], judge_id: player_ids[judge_index], points: num_players)
     end
+    # Update game state
+    next_round
+    update_attributes(current_state: 2)
   end
   protected :start
 
-  # Advance game to the next round
+  # Advance game to the next round or complete the game
   def next_round
-    update_attributes(round: round + 1)
+    unless current_round == num_rounds
+      update_attributes(current_round: current_round + 1)
+    else
+      update_attributes(current_state: 3)
+    end
   end
-  protected :next_round
 
 end

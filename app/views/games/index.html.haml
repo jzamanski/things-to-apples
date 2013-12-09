@@ -6,7 +6,7 @@
     %th Current / Total Players
     %th Current / Total Rounds
     %th Join
-  - Game.awaiting_players.each do |game|
+  - Game.waiting_for_players.each do |game|
     %tr
       %td= game.id
       %td= "#{game.players.count} / #{game.num_players}"
@@ -27,4 +27,4 @@
     %tr
       %td= game.id
       %td= "#{game.players.count} / #{game.num_players}"
-      %td= "#{game.round} / #{game.num_rounds}"
+      %td= "#{game.current_round} / #{game.num_rounds}"

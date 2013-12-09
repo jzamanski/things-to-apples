@@ -1,6 +1,7 @@
 class Card < ActiveRecord::Base
 
-  def self.random(count)
+  # Select count cards at random
+  def self.sample(count)
     return false if count > Card.count
     Card.select(:id).map{|m| m.id}.sample(count, random: Random.new)
   end

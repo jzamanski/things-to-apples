@@ -1,6 +1,7 @@
 <%= link_to('Things to Apples', root_path, {class: 'brand'}) %>
 <ul class="nav">
   <% if user_signed_in? %>
+    <li><%= "Logged in as #{current_user.email}" %>
     <li><%= link_to('Logout', destroy_user_session_path, method: 'delete') %></li>
     <li><%= link_to 'Edit account', edit_user_registration_path %></li>
   <% else %>

@@ -12,15 +12,14 @@ class GamesController < ApplicationController
   end
 
   def create
-    safe_params = params.require(:game).permit(:num_players, :num_rounds)
-    
     # Create new game
+    safe_params = params.require(:game).permit(:num_players, :num_rounds)
     @game = Game.create(safe_params.merge(creator: current_user))
-    if @game.persisted?
+    unless @game.errors.any?
       @game.add_player(current_user)
       return redirect_to(auth_root_path, flash: {success: 'New game created successfully.'})
     else
-      flash.now[:error] = 'Error creating new game.'
+      flash.now[:error] = @game.errors.full_messages.to_sentence
       return render :new
     end
   end
@@ -47,27 +46,50 @@ class GamesController < ApplicationController
   def show
     # Confirm game exists
     return redirect_to(games_path, {flash: {error: 'Unknown game.'}}) unless @game = Game.find_by(id: params[:id])
-    # Show game if completed
-    return render(:show_complete) if @game.complete?
-    # Confirm user is playing game
-    return redirect_to(games_path, {flash: {error: 'You are not playing that game.'}}) unless @game.players.include?(current_user)
-    # Render waiting view
-    return render(:show_waiting) if @game.waiting?
-    # Render in progress view
-    return render(:show_in_progress) if @game.in_progress?
+    # Confirm user is playing game or game is complete
+    return redirect_to(games_path, {flash: {error: 'You are not playing that game.'}}) unless @game.players.include?(current_user) || @game.complete?
+    @round = @game.round
   end
 
   # Respond action
   def respond
-    safe_params = params.require(:response).permit(:response)
     # Confirm game exists
     return redirect_to(games_path, {flash: {error: 'Unknown game.'}}) unless @game = Game.find_by(id: params[:game_id])
-    # Confirm game is in progress (so current_round doesn't fail)
-    return redirect_to(game_path(@game), {flash: {error: 'Game is not accepting responses'}}) unless @game.in_progress?
-    # Create response
-    response = @game.current_round.responses.create(safe_params.merge(player: current_user))
-    flash[:error] = response.errors.full_messages.to_sentence if response.errors.any?
-    return redirect_to(game_path(@game))
+    # Confirm game is in progress and round is accepting responses
+    return redirect_to(game_path(@game), {flash: {error: 'Game is not in progress'}}) unless @game.in_progress?
+    @round = @game.round
+    return redirect_to(game_path(@game), {flash: {error: 'Round is not accepting responses'}}) unless @round.accepting_responses?
+    # Save response
+    safe_params = params.require(:response).permit(:response)
+    response = @round.responses.create(safe_params.merge(player: current_user))
+    # Render/Redirect
+    if response.errors.any?
+      flash.now[:error] = response.errors.full_messages.to_sentence
+      return render :show
+    else
+      return redirect_to(game_path(@game))
+    end
+  end
+
+  # Score action
+  def score
+    # Confirm game exists
+    return redirect_to(games_path, {flash: {error: 'Unknown game.'}}) unless @game = Game.find_by(id: params[:game_id])
+    # Confirm game is in progress, round is accepting scores, and current_user is the judge for round
+    return redirect_to(game_path(@game), {flash: {error: 'Game is not in progress'}}) unless @game.in_progress?
+    @round = @game.round
+    return redirect_to(game_path(@game), {flash: {error: 'Round is not accepting scores'}}) unless @round.accepting_scores?
+    return redirect_to(game_path(@game), {flash: {error: 'You are not the judge for this round'}}) unless @round.judge == current_user
+    # Save scores
+    safe_params = params.require(:round).permit(responses_attributes: [:id, :points])
+    @round.save_scores(safe_params)
+    # Render/Redirect
+    if @round.errors.any?
+      flash.now[:error] = @round.errors.full_messages.to_sentence
+      return render :show
+    else
+      return redirect_to(game_path(@game))
+    end
   end
 
 end

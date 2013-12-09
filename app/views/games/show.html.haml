@@ -1,0 +1,29 @@
+- if @game.waiting_for_players?
+  Waiting for more players.
+- elsif @game.in_progress?
+  %div= "Round: #{@game.current_round}"
+  %div= "Judge: #{@round.judge.email}"
+  %div= "Card: #{@round.card.phrase}"
+  - if @round.accepting_responses?
+    - if @round.judge == current_user
+      Waiting for all players to respond.
+    - elsif @round.player_responded?(current_user)
+      Waiting for other players to respond.
+    - else
+      = form_for(@round.responses.new, {url: game_respond_path(@game), method: :post}) do |form|
+        = form.text_field(:response)
+        = form.submit
+  - elsif @round.accepting_scores?
+    - if @round.judge == current_user
+      = form_for(@round, {url: game_score_path(@game), method: :post}) do |round_form|
+        = round_form.fields_for(:responses) do |response_fields|
+          %div
+            = response_fields.object.player.email
+            = response_fields.text_field(:points)
+        = round_form.submit
+    - else
+      Waiting for scores.
+  - else
+    ERROR, you shouldn't end up here.
+- elsif @game.complete?
+  GAME SUMMARY

@@ -2,5 +2,5 @@ one:
   num_players: 3
   num_rounds: 3
   creator: two
-  active: true
-  round: 0
+  current_state: 1
+  current_round: 0

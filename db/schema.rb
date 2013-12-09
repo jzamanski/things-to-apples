@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131208050719) do
+ActiveRecord::Schema.define(version: 20131209040336) do
 
   create_table "cards", force: true do |t|
     t.string   "phrase"
@@ -32,8 +32,8 @@ ActiveRecord::Schema.define(version: 20131208050719) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "creator_id"
-    t.integer  "round"
-    t.boolean  "active"
+    t.integer  "current_round"
+    t.integer  "current_state"
   end
 
   create_table "responses", force: true do |t|
@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(version: 20131208050719) do
     t.integer  "card_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "points"
   end
 
   add_index "rounds", ["card_id"], name: "index_rounds_on_card_id"
