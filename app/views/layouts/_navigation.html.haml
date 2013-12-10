@@ -2,10 +2,14 @@
   %div.navbar-inner
     = link_to('Things to Apples', root_path, {class: 'brand'})
     %ul.nav
+      %li= link_to('How to Play', instructions_path)
+    %ul.nav.pull-right
       - if user_signed_in?
-        %li= "Logged in as #{current_user.email}"
         %li= link_to('Logout', destroy_user_session_path, method: 'delete')
-        %li= link_to('Edit account', edit_user_registration_path)
+        %li.divider-vertical
+        %li
+          %p.navbar-text= " Logged in as: #{current_user.email}"
       - else
         %li= link_to('Login', new_user_session_path)
-        %li= link_to('Sign up', new_user_registration_path)
+        %li.divider-vertical
+        %li= link_to('Sign Up', new_user_registration_path)

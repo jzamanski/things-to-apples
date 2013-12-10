@@ -5,6 +5,7 @@ class GamesController < ApplicationController
     unless current_user.games.active.count == 0
       redirect_to(game_path(current_user.games.active.first))
     end
+    @leaders = User.all.reject{|user| user.wins == 0}.sort_by{|user| -user.wins}
   end
 
   def new
@@ -27,19 +28,10 @@ class GamesController < ApplicationController
   # Join a game
   def join
     # Confirm game exists
-    unless @game = Game.find_by(id: params[:game_id])
-      return redirect_to(games_path, {flash: {error: 'Unknown game.'}})
-    end
-    # Confirm user isn't already playing a game
-    unless current_user.games.active.count == 0
-      return redirect_to(games_path, {flash: {error: 'Please finish your current game first.'}})
-    end
+    return redirect_to(games_path, {flash: {error: 'Unknown game.'}}) unless @game = Game.find_by(id: params[:game_id])
     # Attempt to add player to game
-    if @game.add_player(current_user)
-      return redirect_to(game_path(@game))
-    else
-      redirect_to(games_path, {flash: {error: 'Unknown error joining game.'}})
-    end
+    @game.add_player(current_user)
+    return @game.errors.any? ? redirect_to(games_path, {flash: {error: @game.errors.full_messages.to_sentence}}) : redirect_to(game_path(@game))
   end
 
   # Show a game

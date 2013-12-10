@@ -1,29 +1,44 @@
-- if @game.waiting_for_players?
-  Waiting for more players.
-- elsif @game.in_progress?
-  %div= "Round: #{@game.current_round}"
-  %div= "Judge: #{@round.judge.email}"
-  %div= "Card: #{@round.card.phrase}"
-  - if @round.accepting_responses?
-    - if @round.judge == current_user
-      Waiting for all players to respond.
-    - elsif @round.player_responded?(current_user)
-      Waiting for other players to respond.
-    - else
-      = form_for(@round.responses.new, {url: game_respond_path(@game), method: :post}) do |form|
-        = form.text_field(:response)
-        = form.submit
-  - elsif @round.accepting_scores?
-    - if @round.judge == current_user
-      = form_for(@round, {url: game_score_path(@game), method: :post}) do |round_form|
-        = round_form.fields_for(:responses) do |response_fields|
-          %div
-            = response_fields.object.player.email
-            = response_fields.text_field(:points)
-        = round_form.submit
-    - else
-      Waiting for scores.
-  - else
-    ERROR, you shouldn't end up here.
-- elsif @game.complete?
-  GAME SUMMARY
+%div.row
+  %div.span8
+    %div.info
+      %h3 Game Information
+      = render('info')
+    %br
+    - if @game.waiting_for_players?
+      %div.waiting= "Waiting for #{@game.num_players_missing} #{'player'.pluralize(@game.num_players_missing)} to join the game."
+    - elsif @game.in_progress?
+      %h3.phrase= "#{@round.card.phrase}..."
+      - if @round.accepting_responses?
+        - if @round.judge == current_user || @round.player_responded?(current_user)
+          %div.waiting= "Waiting for #{@round.num_responses_missing} #{'player'.pluralize(@round.num_responses_missing)} to respond."
+        - else
+          %div.response
+            = form_for(@round.responses.new, {url: game_respond_path(@game), method: :post, html: {class: 'form-horizontal'}}) do |form|
+              %div.control-group
+                = form.label(:response, {class: 'control-label'})
+                %div.controls= form.text_field(:response)
+              %div.control-group
+                %div.controls= form.submit('Submit Response', {class: 'btn'})
+      - elsif @round.accepting_scores?
+        - if @round.judge == current_user
+          %div.score
+            = form_for(@round, {url: game_score_path(@game), method: :post, html: {class: 'form-horizontal'}}) do |round_form|
+              %div.cntrol-group
+                %div.controls
+                  %h5= "Award #{@round.points} total points."
+              = round_form.fields_for(:responses, @round.responses_sorted_by_response) do |response_fields|
+                %div.control-group
+                  %label.control-label= response_fields.object.response
+                  %div.controls= response_fields.text_field(:points)
+              %div.control-group
+                %div.controls= round_form.submit('Submit Scores', {class: 'btn'})
+        - else
+          %div.waiting
+            %h5 Waiting for the judge to score responses.
+            %ul
+              - @round.responses_sorted_by_response.each do |response|
+                %li= response.response
+    - elsif @game.complete?
+      %div.details= render('details')
+  - unless @game.waiting_for_players?
+    %div.span4= render('score')

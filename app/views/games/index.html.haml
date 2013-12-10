@@ -1,30 +1,41 @@
-= link_to('New Game', new_game_path)
-%h4 Join A Game
-%table
-  %tr
-    %th Game ID
-    %th Current / Total Players
-    %th Current / Total Rounds
-    %th Join
-  - Game.waiting_for_players.each do |game|
-    %tr
-      %td= game.id
-      %td= "#{game.players.count} / #{game.num_players}"
-      %td= "#{game.round} / #{game.num_rounds}"
-      %td
-        = form_for(game, {url: game_join_path(game), method: :post}) do |f|
-          = f.submit('Join')
-%hr
-%hr
-%hr
-%h4 Created Games
-%table
-  %tr
-    %th Game ID
-    %th Current / Total Players
-    %th Current / Total Rounds
-  - Game.created_by(current_user).each do |game|
-    %tr
-      %td= game.id
-      %td= "#{game.players.count} / #{game.num_players}"
-      %td= "#{game.current_round} / #{game.num_rounds}"
+%div.row
+  %div.span8
+    %h3
+      Join A Game 
+      = link_to('(New Game)', new_game_path)
+    %table.table.table-bordered.table-condensed
+      %tr
+        %th.span2 Rounds
+        %th.span2 Players
+        %th.span1 Join
+      - Game.waiting_for_players.each do |game|
+        %tr
+          %td= "#{game.num_rounds}"
+          %td= "#{game.players.count} of #{game.num_players}"
+          %td
+            = form_for(game, {url: game_join_path(game), method: :post}) do |f|
+              = f.submit('Join')
+    %hr
+    %h3 Completed Games
+    %table.table.table-bordered.table-condensed
+      %tr
+        %th.span2 Rounds
+        %th.span2 Players
+        %th Winner
+        %th.span1 Details
+      - Game.complete.order(created_at: :desc).each do |game|
+        %tr
+          %td= "#{game.num_rounds}"
+          %td= "#{game.num_players}"
+          %td= "#{game.winner.email}"
+          %td= link_to('Details', game_path(game))
+  %div.span4
+    %h3 Leaderboard
+    %table.table.table-bordered.table-condensed
+      %tr
+        %th.span3 Player
+        %th.span1 Wins
+      - @leaders.each do |leader|
+        %tr
+          %td.span3= leader.email
+          %td.span1= leader.wins

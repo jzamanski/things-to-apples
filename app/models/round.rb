@@ -8,13 +8,7 @@ class Round < ActiveRecord::Base
   accepts_nested_attributes_for :responses, update_only: true
 
   # Validations
-  validate :points_awarded_equals_points_available, {on: :update}
-  def points_awarded_equals_points_available
-    unless responses.map{|response| response.points}.sum == points
-      errors.add(:base, 'Total points awarded is incorrect')
-    end
-  end
-  protected :points_awarded_equals_points_available
+  validates_numericality_of :points_awarded, {on: :update, only_integer: true, equal_to: :points}
 
   # Callbacks
   before_validation :update_responses_points_nil_to_zero, {on: :update}
@@ -46,6 +40,18 @@ class Round < ActiveRecord::Base
   end
   def player_responded?(player)
     responses.find_by(player: player)
+  end
+  def num_responses_missing
+    game.num_players - responses.count - 1
+  end
+  def responses_sorted_by_response
+    responses.sort_by{|response| response.response}
+  end
+  def responses_sorted_by_points_and_player
+    responses.sort_by{|response| [-response.points, response.player.email.downcase]}
+  end
+  def points_awarded
+    responses.map{|response| response.points}.sum
   end
 
   # Save scores and move to the next round

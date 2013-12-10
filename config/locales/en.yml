@@ -20,4 +20,13 @@
 # available at http://guides.rubyonrails.org/i18n.html.
 
 en:
-  hello: "Hello world"
+  activerecord:
+    attributes:
+      game:
+        num_players: Number of Players
+        num_rounds: Number of Rounds
+  helpers:
+      label:
+        game:
+          num_players: 'Number of Players'
+          num_rounds: 'Number of Rounds'

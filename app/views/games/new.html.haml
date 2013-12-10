@@ -1,8 +1,10 @@
-= form_for(@game) do |f|
-  = f.label(:num_players)
-  = f.text_field(:num_players)
-  %br
-  = f.label(:num_rounds)
-  = f.text_field(:num_rounds)
-  %br
-  = f.submit
+%h4 New Game
+= form_for(@game, {html: {class: 'form-horizontal'}}) do |f|
+  %div.control-group
+    = f.label(:num_players, {class: 'control-label'})
+    %div.controls= f.text_field(:num_players, {placeholder: '3 - 10'})
+  %div.control-group
+    = f.label(:num_rounds, {class: 'control-label'})
+    %div.controls= f.text_field(:num_rounds, {placeholder: '# of Players - 10'})
+  %div.control-group
+    %div.controls= f.submit({class: 'btn'})

@@ -1,0 +1,9 @@
+- flash.each do |type, msg|
+  %div{class: "alert alert-#{type}"}
+    %a.close{data: {dismiss: 'alert'}} &times;
+    - if msg.is_a?(Array)
+      %ul{id: "flash_#{type}"}
+      - msg.each do |m|
+        %li= m
+    - else
+      %span= msg

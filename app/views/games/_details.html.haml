@@ -1,0 +1,13 @@
+%h3 Game Details
+- @game.rounds.each do |round|
+  %h4= "Round #{round.round} - #{round.card.phrase}"
+  %table.table.table-bordered.table-condensed
+    %tr
+      %th.span2 Player
+      %th.span4 Response
+      %th.span1 Points
+    - round.responses_sorted_by_points_and_player.each do |response|
+      %tr
+        %td.span2= response.player.email
+        %td.span4= response.response
+        %td.span1= response.points

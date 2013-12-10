@@ -1,0 +1,8 @@
+- if @game.waiting_for_players? || @game.complete?
+  %div= "Rounds: #{@game.num_rounds}"
+  %div= "Players: #{@game.num_players}"
+- if @game.in_progress?
+  %div= "Round: #{@round.round} of #{@game.num_rounds}"
+  %div= "Judge: #{@round.judge.email}"
+- if @game.complete?
+  %div= "Winner: #{@game.winner.email}"

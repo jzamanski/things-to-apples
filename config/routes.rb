@@ -1,16 +1,27 @@
 ThingsToApples::Application.routes.draw do
-  devise_for :users
+  devise_for :users, skip: :registrations
+  devise_scope :user do
+    resource :registration,
+      only: [:new, :create],
+      path: 'users',
+      path_names: { new: 'sign_up' },
+      controller: 'devise/registrations',
+      as: :user_registration
+  end
+  
   unauthenticated do
     root to: 'home#index'
   end
+  get 'instructions' => 'home#instructions'
+
   authenticated :user do
     root to: 'games#index', as: :auth_root
   end
 
   resources :games, only: [:index, :new, :create, :show] do
-    post 'join'
-    post 'respond'
-    post 'score'
+    post :join
+    post :respond
+    post :score
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

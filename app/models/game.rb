@@ -18,8 +18,6 @@ class Game < ActiveRecord::Base
   # Callbacks
   before_validation :set_defaults, {on: :create}
   def set_defaults
-    self.num_rounds ||= 3
-    self.num_players ||= 3
     self.current_state = 1
     self.current_round = 0
   end
@@ -61,8 +59,25 @@ class Game < ActiveRecord::Base
     rounds.find_by(round: current_round)
   end
 
+  # Game players by points
+  def game_players_by_points
+    game_players.sort_by{|game_player| [-game_player.points, game_player.player.email.downcase]}
+  end
+
+  # Game winner
+  def winner
+    complete? ? game_players_by_points.first.player : '---'
+  end
+
+  # Players left before game starts
+  def num_players_missing
+    num_players - game_players.count
+  end
+
   # Add a player to the game
   def add_player(player)
+    # Confirm user isn't already playing a game
+    return game.errors.add(:base, 'Player is already playing a game') unless player.games.active.count == 0
     # Confirm the game is not full
     return game.errors.add(:base, 'Game is full') unless players.count < num_players
     # Add player

@@ -1,0 +1,4 @@
+%div.score
+  %h3 Scoreboard
+  - @game.game_players_by_points.each do |game_player|
+    %div= "#{game_player.player.email}: #{game_player.points}"
