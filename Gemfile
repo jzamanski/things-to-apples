@@ -7,7 +7,8 @@ gem 'rails', '4.0.0.rc2'
 gem 'dotenv-rails', group: :production
 
 # Database
-gem 'sqlite3'
+gem 'sqlite3', group: [:development, :test]
+gem 'mysql2', group: :production
 
 # Authentication
 gem 'devise'
