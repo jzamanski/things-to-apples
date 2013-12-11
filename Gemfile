@@ -3,6 +3,9 @@ source 'https://rubygems.org'
 # Rails
 gem 'rails', '4.0.0.rc2'
 
+# Environment
+gem 'dotenv-rails', group: :production
+
 # Database
 gem 'sqlite3'
 
