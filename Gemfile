@@ -52,6 +52,6 @@ group :doc do
 end
 
 # Deployment
-gem 'passenger', group: :production
+gem 'passenger', '= 4.0.20', group: :production
 # gem 'unicorn'
 # gem 'capistrano', group: :development
