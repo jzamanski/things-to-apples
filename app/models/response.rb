@@ -7,6 +7,8 @@ class Response < ActiveRecord::Base
 
   # Validations
   validates_presence_of :response
+  validates_length_of :response, {minimum: 1, maximum: 256}
+  validates_format_of :response, {with: /[\w\-'",;:.?!]+/}
   validates_numericality_of :points, {only_integer: true, greater_than_or_equal_to: 0}
   validates_uniqueness_of :player, {scope: :round, message: 'has already responded'}
   
