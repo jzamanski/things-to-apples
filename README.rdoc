@@ -48,15 +48,34 @@ The MySQL database must be initialized beore the application is started.  To loa
 Assets must be precompiled to static assets.  To precompile static assets execute:
 - rake assets:precompile RAILS_ENV=production
 
-Phusion Passenger Standalone web server is used in production.  To install Passenger execute:
-- gem install passenger
-
-NGINX reverse proxy serveris used in production.  To install NGINX (and it's dependencies) execute:
+The NGINX reverse proxy server is used in production.  To install and configure NGINX (and it's dependencies) execute:
 - sudo apt-get install libcurl4-gnutls-dev
 - rvmsudo passenger-install-nginx-module (select default options)
 
 NGINX must be configured to serve the application.  To configure NGINX execute:
 - sudo nano /opt/nginx/conf/nginx.conf
-- TODO: ADD SERVER BLOCKS
+- add the following two server blocks within the http block
+    server {
+        listen 80;
+        server_name '';
+        return 301 https://zam.pcanywhere.net:443$request_uri;
+    }
+    server {
+        listen 443;
+        server_name '';
+        root /home/jeff/things-to-apples/public;
+        passenger_enabled on;
+        ssl on;
+        ssl_certificate /absolute/path/to/server.crt;
+        ssl_certificate_key /absolute/path/to/server.key;
+    }
 
-TODO: NGINX Startup/Stop/Reload scripts
+NGINX must be started to server the application.  To install start/stop scripts and start NGINX execute:
+- sudo wget -O init-deb.sh http://library.linode.com/assets/660-init-deb.sh
+- sudo mv init-deb.sh /etc/init.d/nginx
+- sudo chmod +x /etc/init.d/nginx
+- sudo service nginx start (it can be stopped or reload the configuration by passing 'stop' or 'reload' instead of 'start')
+
+A daemon is required to automatically timeout requests when users do not respond.  To start the daemon execute:
+- bin/delayed_job start RAILS_ENV=production (it can be stopped by passing 'stop' instead of 'start')
+
