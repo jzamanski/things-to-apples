@@ -68,10 +68,10 @@ class Round < ActiveRecord::Base
 
   # Response/Save Timeouts
   def start_response_timer
-    delay(run_at: game.timeout.seconds.from_now).response_timeout_callback
+    delay(run_at: game.timeout.minutes.from_now).response_timeout_callback
   end
   def start_score_timer
-    delay(run_at: game.timeout.seconds.from_now).score_timeout_callback
+    delay(run_at: game.timeout.minutes.from_now).score_timeout_callback
   end
   def response_timeout_callback
     if accepting_responses?
