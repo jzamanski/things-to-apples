@@ -69,6 +69,7 @@ class Game < ActiveRecord::Base
   def winners
     winners = game_players.select{|game_player| game_player.result == 2}.map{|game_player| game_player.player}
     winners = game_players.select{|game_player| game_player.result == 1}.map{|game_player| game_player.player} if winners.count == 0
+    winners
   end
   def losers
     game_players.select{|game_player| game_player.result == 0}.map{|game_player| player}
