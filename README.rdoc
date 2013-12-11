@@ -77,4 +77,4 @@ NGINX must be started to server the application.  To install start/stop scripts 
     sudo service nginx start (it can be stopped or reload the configuration by passing 'stop' or 'reload' instead of 'start')
 
 A daemon is required to automatically timeout requests when users do not respond.  To start the daemon execute:
-    bin/delayed_job start RAILS_ENV=production (it can be stopped by passing 'stop' instead of 'start')
+    RAILS_ENV=production bin/delayed_job start (it can be stopped by passing 'stop' instead of 'start')
