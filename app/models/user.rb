@@ -1,9 +1,10 @@
 class User < ActiveRecord::Base
   # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable and :omniauthable
+  # :confirmable, :lockable, and :omniauthable
   # Removed default devise modules. :recoverable
   devise :database_authenticatable, :registerable,
-         :rememberable, :trackable, :validatable
+         :rememberable, :trackable, :validatable,
+         :timeoutable, {timeout_in: 30.minutes}
 
   # Associations
   has_many :created_games, {class_name: :Game, inverse_of: :creator}
