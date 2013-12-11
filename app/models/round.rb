@@ -33,10 +33,10 @@ class Round < ActiveRecord::Base
     false #TODO
   end
   def accepting_responses?
-    current_round? && !all_responses_received? && !response_timeout_passed?
+    current_round? && !all_responses_received? && !response_timeout
   end
   def accepting_scores?
-    current_round? && !accepting_responses? && !all_scores_received? && !score_timeout_passed?
+    current_round? && !accepting_responses? && !all_scores_received? && !score_timeout
   end
   def player_responded?(player)
     responses.find_by(player: player)
@@ -54,12 +54,42 @@ class Round < ActiveRecord::Base
     responses.map{|response| response.points}.sum
   end
 
+  # Save response
+  def save_response(params)
+    response = responses.create(params)
+    start_score_timer if accepting_scores?
+    return response
+  end
   # Save scores and move to the next round
-  def save_scores(scores)
-    # Save scores
-    update_attributes(scores)
-    # Advance game to next round
+  def save_scores(params)   
+    update_attributes(params)
     game.next_round unless accepting_scores?
+  end
+
+  # Response/Save Timeouts
+  def start_response_timer
+    delay(run_at: game.timeout.seconds.from_now).response_timeout_callback
+  end
+  def start_score_timer
+    delay(run_at: game.timeout.seconds.from_now).score_timeout_callback
+  end
+  def response_timeout_callback
+    if accepting_responses?
+      update_attribute(:response_timeout, true)
+      if responses.count == 0
+        update_attribute(:score_timeout, true)
+        game.next_round
+      else
+        start_score_timer
+      end
+    end
+  end
+  def score_timeout_callback 
+    if accepting_scores?
+      update_attribute(:score_timeout, true)
+      responses.each{|response| response.update_attributes(points: 1)}
+      game.next_round
+    end
   end
 
 end

@@ -31,13 +31,15 @@
                   %label.control-label= response_fields.object.response
                   %div.controls= response_fields.text_field(:points)
               %div.control-group
-                %div.controls= round_form.submit('Submit Scores', {class: 'btn'})
+                %div.controls= round_form.submit('Submit Points', {class: 'btn'})
         - else
           %div.waiting
-            %h5 Waiting for the judge to score responses.
+            %h5= "Waiting for #{@round.judge.email} to award points."
             %ul
               - @round.responses_sorted_by_response.each do |response|
                 %li= response.response
+      - else
+        %div.waiting
     - elsif @game.complete?
       %div.details= render('details')
   - unless @game.waiting_for_players?

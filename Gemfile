@@ -10,6 +10,9 @@ gem 'sqlite3'
 gem 'devise'
 # gem 'bcrypt-ruby', '~> 3.0.0'
 
+# Async Processing
+gem 'delayed_job_active_record'
+
 # HTML
 gem 'haml'
 

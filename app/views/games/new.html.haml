@@ -2,9 +2,12 @@
 = form_for(@game, {html: {class: 'form-horizontal'}}) do |f|
   %div.control-group
     = f.label(:num_players, {class: 'control-label'})
-    %div.controls= f.text_field(:num_players, {placeholder: '3 - 10'})
+    %div.controls= f.text_field(:num_players, {placeholder: '3 - 100'})
   %div.control-group
     = f.label(:num_rounds, {class: 'control-label'})
-    %div.controls= f.text_field(:num_rounds, {placeholder: '# of Players - 10'})
+    %div.controls= f.text_field(:num_rounds, {placeholder: '# of Players - 100'})
+  %div.control-group
+    = f.label(:timeout, {class: 'control-label'})
+    %div.controls= f.text_field(:timeout, {placeholder: 'minutes'})
   %div.control-group
     %div.controls= f.submit({class: 'btn'})

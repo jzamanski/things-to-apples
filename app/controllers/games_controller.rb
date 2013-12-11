@@ -14,7 +14,7 @@ class GamesController < ApplicationController
 
   def create
     # Create new game
-    safe_params = params.require(:game).permit(:num_players, :num_rounds)
+    safe_params = params.require(:game).permit(:num_players, :num_rounds, :timeout)
     @game = Game.create(safe_params.merge(creator: current_user))
     unless @game.errors.any?
       @game.add_player(current_user)
@@ -53,7 +53,7 @@ class GamesController < ApplicationController
     return redirect_to(game_path(@game), {flash: {error: 'Round is not accepting responses'}}) unless @round.accepting_responses?
     # Save response
     safe_params = params.require(:response).permit(:response)
-    response = @round.responses.create(safe_params.merge(player: current_user))
+    response = @round.save_response(safe_params.merge(player: current_user))
     # Render/Redirect
     if response.errors.any?
       flash.now[:error] = response.errors.full_messages.to_sentence

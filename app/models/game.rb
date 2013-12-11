@@ -11,8 +11,9 @@ class Game < ActiveRecord::Base
   validates_presence_of :creator_id, :creator
   validates_presence_of :current_state
   validates_numericality_of :current_state, {only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 3}
-  validates_numericality_of :num_players, {only_integer: true, greater_than_or_equal_to: 3, less_than_or_equal_to: 10}
-  validates_numericality_of :num_rounds, {only_integer: true, greater_than_or_equal_to: :num_players, less_than_or_equal_to: 10}
+  validates_numericality_of :num_players, {only_integer: true, greater_than_or_equal_to: 3, less_than_or_equal_to: 100}
+  validates_numericality_of :num_rounds, {only_integer: true, greater_than_or_equal_to: :num_players, less_than_or_equal_to: 100}
+  validates_numericality_of :timeout, {only_integer: true, greater_than_or_equal_to: 1, less_than_or_equal_to: 60}
   validates_numericality_of :current_round, {only_integer: true, greater_than_or_equal_to: 0, less_than_or_equal_to: :num_rounds}
 
   # Callbacks
@@ -77,9 +78,9 @@ class Game < ActiveRecord::Base
   # Add a player to the game
   def add_player(player)
     # Confirm user isn't already playing a game
-    return game.errors.add(:base, 'Player is already playing a game') unless player.games.active.count == 0
+    return errors.add(:base, 'Player is already playing a game') unless player.games.active.count == 0
     # Confirm the game is not full
-    return game.errors.add(:base, 'Game is full') unless players.count < num_players
+    return errors.add(:base, 'Game is full') unless players.count < num_players
     # Add player
     game_players.create(player: player)
     start if players.count == num_players
@@ -105,6 +106,7 @@ class Game < ActiveRecord::Base
   def next_round
     unless current_round == num_rounds
       update_attributes(current_round: current_round + 1)
+      round.start_response_timer
     else
       update_attributes(current_state: 3)
     end
