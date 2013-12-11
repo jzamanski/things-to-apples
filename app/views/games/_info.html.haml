@@ -1,3 +1,4 @@
+%h4 Dashboard
 - if @game.waiting_for_players? || @game.complete?
   %div= "Rounds: #{@game.num_rounds}"
   %div= "Players: #{@game.num_players}"
@@ -5,4 +6,4 @@
   %div= "Round: #{@round.round} of #{@game.num_rounds}"
   %div= "Judge: #{@round.judge.email}"
 - if @game.complete?
-  %div= "Winner: #{@game.winner.email}"
+  %div= "#{'Winner'.pluralize(@game.winners.count)}: #{@game.winners.map{|winner| winner.email}.to_sentence}"

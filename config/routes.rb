@@ -12,13 +12,16 @@ ThingsToApples::Application.routes.draw do
   unauthenticated do
     root to: 'home#index'
   end
+  get 'play' => 'home#play'
   get 'instructions' => 'home#instructions'
+  get 'leaders' => 'home#leaders'
+  get 'archives' => 'home#archives'
 
   authenticated :user do
-    root to: 'games#index', as: :auth_root
+    root to: 'home#play', as: :auth_root
   end
 
-  resources :games, only: [:index, :new, :create, :show] do
+  resources :games, only: [:new, :create, :show] do
     post :join
     post :respond
     post :score

@@ -1,0 +1,21 @@
+%div.row
+  %div.span8
+    %div.waiting
+      - if Game.waiting_for_players.count > 0
+        %h4
+          Join an Existing Game
+        %table.table.table-bordered.table-condensed
+          %tr
+            %th.span2 Rounds
+            %th.span2 Players
+            %th.span2
+          - Game.waiting_for_players.each do |game|
+            %tr
+              %td.span2= "#{game.num_rounds}"
+              %td.span2= "#{game.players.count} of #{game.num_players}"
+              %td.span2
+                = form_for(game, {url: game_join_path(game), method: :post}) do |f|
+                  = f.submit('Join')
+      - else
+        There are no games waiting for players.
+    %h4= link_to('Click here to start a new game.', new_game_path)

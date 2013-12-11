@@ -1,8 +1,15 @@
 %div.navbar
   %div.navbar-inner
-    = link_to('Things to Apples', root_path, {class: 'brand'})
+    = link_to('Things to Apples', play_path, {class: 'brand'})
     %ul.nav
-      %li= link_to('How to Play', instructions_path)
+      - if user_signed_in?
+        %li= link_to('Play', play_path)
+        %li.divider-vertical
+        %li= link_to('Leaderboard', leaders_path)
+        %li.divider-vertical
+        %li= link_to('Game Archive', archives_path)
+        %li.divider-vertical
+      %li= link_to('Instructions', instructions_path)
     %ul.nav.pull-right
       - if user_signed_in?
         %li= link_to('Logout', destroy_user_session_path, method: 'delete')

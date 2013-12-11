@@ -1,0 +1,10 @@
+= form_for(@round, {url: game_score_path(@game), method: :post, html: {class: 'form-horizontal'}}) do |round_form|
+  %div.cntrol-group
+    %div.controls
+      %h5= "Award #{@round.points} total points."
+  = round_form.fields_for(:responses, @round.responses_sorted_by_response) do |response_fields|
+    %div.control-group
+      %label.control-label= response_fields.object.response
+      %div.controls= response_fields.text_field(:points)
+  %div.control-group
+    %div.controls= round_form.submit('Submit Points', {class: 'btn'})

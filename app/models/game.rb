@@ -65,9 +65,13 @@ class Game < ActiveRecord::Base
     game_players.sort_by{|game_player| [-game_player.points, game_player.player.email.downcase]}
   end
 
-  # Game winner
-  def winner
-    complete? ? game_players_by_points.first.player : '---'
+  # Game Winners/Losers
+  def winners
+    winners = game_players.select{|game_player| game_player.result == 2}.map{|game_player| game_player.player}
+    winners = game_players.select{|game_player| game_player.result == 1}.map{|game_player| game_player.player} if winners.count == 0
+  end
+  def losers
+    game_players.select{|game_player| game_player.result == 0}.map{|game_player| player}
   end
 
   # Players left before game starts
@@ -108,6 +112,18 @@ class Game < ActiveRecord::Base
       update_attributes(current_round: current_round + 1)
       round.start_response_timer
     else
+      max_points = game_players_by_points.first.points
+      if max_points == 0
+        game_players.each{|game_player| game_player.set_lose}
+      else
+        has_winner = game_players.select{|game_player| game_player.points == max_points}.count == 1
+        if has_winner
+          game_players_by_points.first.set_win
+        else
+          game_players.select{|game_player| game_player.points == max_points}.each{|game_player| game_player.set_tie}
+        end
+        game_players.reject{|game_player| game_player.points == max_points}.each{|game_player| game_player.set_lose}
+      end
       update_attributes(current_state: 3)
     end
   end

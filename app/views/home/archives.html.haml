@@ -1,0 +1,15 @@
+%div.row
+  %div.span8
+    %h3 Archived Games
+    %table.table.table-bordered.table-condensed
+      %tr
+        %th.span2 Rounds
+        %th.span2 Players
+        %th.span2 Winner(s)
+        %th.span2
+      - Game.complete.order(created_at: :desc).each do |game|
+        %tr
+          %td.span2= "#{game.num_rounds}"
+          %td.span2= "#{game.num_players}"
+          %td.span2= "#{game.winners.map{|winner| winner.email}.to_sentence}"
+          %td.span2= link_to('View Details', game_path(game), {class: 'btn'})

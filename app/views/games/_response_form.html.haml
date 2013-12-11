@@ -1,0 +1,6 @@
+= form_for(@round.responses.new, {url: game_respond_path(@game), method: :post, html: {class: 'form-horizontal'}}) do |form|
+  %div.control-group
+    = form.label(:response, {class: 'control-label'})
+    %div.controls= form.text_field(:response)
+  %div.control-group
+    %div.controls= form.submit('Submit Response', {class: 'btn'})

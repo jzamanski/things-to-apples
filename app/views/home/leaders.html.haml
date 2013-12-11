@@ -1,0 +1,15 @@
+%div.row
+  %div.span6
+    %h3 Leaderboard
+    %table.table.table-bordered.table-condensed
+      %tr
+        %th.span3 Player
+        %th.span1 Wins
+        %th.span1 Ties
+        %th.span1 Loses
+      - User.all.sort_by{|user| [-user.result_sum]}.each do |user|
+        %tr
+          %td.span3= user.email
+          %td.span1= user.wins
+          %td.span1= user.ties
+          %td.span1= user.loses
