@@ -12,10 +12,7 @@
       %li= link_to('Instructions', instructions_path)
     %ul.nav.pull-right
       - if user_signed_in?
-        %li= link_to('Logout', destroy_user_session_path, method: 'delete')
-        %li.divider-vertical
-        %li
-          %p.navbar-text= " Logged in as: #{current_user.email}"
+        %li= link_to("Logout: #{current_user.email}", destroy_user_session_path, method: 'delete')
       - else
         %li= link_to('Login', new_user_session_path)
         %li.divider-vertical
