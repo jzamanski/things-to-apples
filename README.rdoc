@@ -1,28 +1,62 @@
-== README
+==Production Environment Setup & Deployment
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+The production environment has been tested using the following software/versions.
+- Ubuntu Server 12.04.3 LTS i386
+- RVM 1.23.10
+- Ruby 2.0.0
+- Rails 4.0.0.rc2
+- MySQL 5.5.32
+- Phusion Passenger 4.0.20
+- NGINX 1.4.2
 
-Things you may want to cover:
+These instructions assume the existence of a dedicated non-root user account for deployment and the possession of a signed SSL certificate.
 
-* Ruby version
+Ruby Version Manager (RVM) allows multiple versions of the Ruby interpreter to be installed and executed concurrently on a single server.  To install RVM and Ruby execute:
+- sudo apt-get install curl
+- \curl -L https:// get.rvm.io | bash -s stable (without the space after 'https://')
+- source ~/.rvm/scripts/rvm
+- rvm requirements
+- rvm install ruby-2.0.0
+- rvm ruby-2.0.0 --default
+- rvm default
 
-* System dependencies
+MySQL server is used for the production database.  To install and configure MySQL server execute:
+- sudo apt-get install libmysqlclient-dev mysql-server (when prompted, enter a strong password for the MySQL root user)
+- mysql -u root -p (enter the MySQL root password at the prompt)
+- grant ALL ON things_to_apples.* TO 'things_to_apples'@'localhost' IDENTIFIED BY 'SecureDatabasePassword';
+- exit
 
-* Configuration
+The application requires the NodeJS Javascript runtime.  To install NodeJS execute:
+- sudo apt-get install nodejs
 
-* Database creation
+The application is stored in a Git repository.  To install Git & clone the repository execute:
+- sudo apt-get install git
+- cd InstallationDirectory (select a secure installation directory)
+- git clone https:// github.com/jzamanski/things-to-apples.git (without the space after 'https://')
 
-* Database initialization
+The application’s Ruby dependencies are managed by Bundler.  To install the application dependencies execute:
+- cd things-to-apples
+- bundle install --without development test (repeat if any OpenSSL errors occur)
 
-* How to run the test suite
+The MySQL database password and the secret key used for signing session cookies are not stored in source control and must be supplied in the file '.env'.  The MySQL password is the same password provided above in the 'grant' MySQL command.  The secret key is generated using rake.  To set the database password and the secret key execute: 
+- echo "MYSQL_PW: SecureDatabasePassword" >> .env
+- printf "SECRET_KEY: %b\\n" $(rake secret) >> .env
 
-* Services (job queues, cache servers, search engines, etc.)
+The MySQL database must be initialized beore the application is started.  To load the database schema execute:
+- rake db:setup RAILS_ENV=production
 
-* Deployment instructions
+Assets must be precompiled to static assets.  To precompile static assets execute:
+- rake assets:precompile RAILS_ENV=production
 
-* ...
+Phusion Passenger Standalone web server is used in production.  To install Passenger execute:
+- gem install passenger
 
+NGINX reverse proxy serveris used in production.  To install NGINX (and it's dependencies) execute:
+- sudo apt-get install libcurl4-gnutls-dev
+- rvmsudo passenger-install-nginx-module (select default options)
 
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+NGINX must be configured to serve the application.  To configure NGINX execute:
+- sudo nano /opt/nginx/conf/nginx.conf
+- TODO: ADD SERVER BLOCKS
+
+TODO: NGINX Startup/Stop/Reload scripts
