@@ -16,6 +16,7 @@ gem 'devise'
 
 # Async Processing
 gem 'delayed_job_active_record'
+gem 'daemons'
 
 # HTML
 gem 'haml'
