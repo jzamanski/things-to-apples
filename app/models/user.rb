@@ -21,6 +21,6 @@ class User < ActiveRecord::Base
     game_players.select{|game_player| game_player.result == 0}.count
   end
   def result_sum
-    game_players.map{|game_player| game_player.result}.sum
+    game_players.map{|game_player| game_player.game.complete? ? game_player.result : 0}.sum
   end
 end
